@@ -1,0 +1,148 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+{% load extra_tags %}
+{% block heading %}{% endblock %}
+{% block extra_js %}
+    <script type="text/javascript">
+        $(function () {
+            $("#l_total").text('({{ listado.count }})')
+        })
+    </script>
+{% endblock %}
+{% block enlaces_top %}
+    <li class="breadcrumb-item">{{ title }}</li>
+{% endblock %}
+{% block botones_top %}
+    <div class="nav btn-group" role="tablist">
+        <a href="javascript:void(0)"
+           onclick="formModal('','Adicionar torneo','addtorneo','modal-lg')" class="btn btn-success btn-xs btn-xl"
+           title="Adicionar club" data-bs-toggle="tooltip"> <i class="fas fa-plus"></i> Adicionar</a>
+    </div>
+{% endblock %}
+{% block content_1 %}
+    <div class="row mb-3">
+        <form class="col-12" method="GET">
+            <input type="hidden" name="action" value="{{action}}">
+            <!-- Card header -->
+            <div class="card-header border-bottom-0 p-0 bg-white">
+                <div class="d-flex align-items-center">
+                    <span class="position-absolute ps-3 search-icon">
+                        <i class="fe fe-search"></i>
+                    </span>
+                    <input type="search" class="form-control ps-6" name="s" placeholder="Buscar por nombre del nombre de torneo..."
+                           value="{{ s }}"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <!-- table -->
+                <div class="table-responsive">
+                    <table class="table mb-0 table-bordered text-nowrap" id="l_table">
+                        <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-center">
+                                <i class="fas fa-sort-numeric-asc"></i>
+                            </th>
+                            <th scope="col" class="text-center">
+                                Nombre
+                            </th>
+                            <th scope="col" class="">
+                                Fechas
+                            </th>
+                            <th scope="col" class="text-center">
+                                Categoría
+                            </th>
+                            <th scope="col" class="">
+                                Estructura de torneo
+                            </th>
+                            <th scope="col" class="">
+                                Valor tarjeta
+                            </th>
+                            <th>Total Equipos</th>
+                            <th class="text-center">
+                                <i class="fas fa-cogs"></i>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for l in listado %}
+                            <tr>
+                                <td class="text-center align-middle w-3">{{ forloop.counter }}</td>
+                                <td class="align-middle border-top-0 text-center w-30">
+                                    {{ l.nombre }}
+                                </td>
+                                <td class="align-middle border-top-0 w-15">
+                                    <p><b>Inicio: </b>{{l.inicio|date:'d-m-Y'}}</p>
+                                    <p><b>Fin: </b>{{l.fin|date:'d-m-Y'}}</p>
+                                </td>
+                                <td class="align-middle border-top-0 text-center w-30">
+                                    {{ l.get_generotorneo_display }}
+                                </td>
+                                <td class="align-middle border-top-0 lh-15 w-50">
+                                    {% for tipo in l.tipopartidos.all %}
+                                        <div class="mb-2">
+                                            <h6 class="mb-0">{{ tipo }}</h6>
+                                            {% for tf in tipo.fases %}
+                                                <p class="ps-3">{{ tf.fase }}</p>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </td>
+                                <td class="align-middle border-top-0 lh-15 w-50">
+                                    {% for tarjeta in l.tarjetas %}
+                                        <h6 class="mb-2">
+                                            {{ tarjeta.tipotarjeta }}: <span class="text-secondary">${{tarjeta.valor}}</b>
+                                        </h6>
+                                    {% endfor %}
+                                </td>
+                                <td class="text-center w-5 align-middle">{{ l.equipos.all|length }}</td>
+                                <td class="align-middle border-top-0 text-center w-3">
+                                    <span class="dropdown dropstart">
+                                      <a class="btn-icon btn btn-sm rounded-circle" href="#"
+                                         role="button"
+                                         id="courseDropdown1"
+                                         data-bs-toggle="dropdown" data-bs-offset="-20,20"
+                                         aria-expanded="false">
+                                      <i class="fe fe-more-vertical"></i>
+                                      </a>
+                                      <span class="dropdown-menu" aria-labelledby="courseDropdown1">
+                                      <span class="dropdown-header"><i class="fas fa-cogs"></i> Acciones</span>
+                                          <a class="dropdown-item"
+                                             href="{{ request.path }}?action=partidos&id={{ l.id|encrypt }}">
+                                            <i class="fas fa-futbol dropdown-item-icon"></i> Partidos
+                                        </a>
+                                        <a class="dropdown-item"
+                                           href="{{ request.path }}?action=posiciones&id={{ l.id|encrypt }}">
+                                            <i class="fas fa-list-check dropdown-item-icon"></i> Tabla de posiciones
+                                        </a>
+                                        <a class="dropdown-item" href="javascript:void(0);"
+                                           onclick="formModal('{{ l.pk|encrypt }}','Editar {{ l }}','edittorneo','modal-lg')">
+                                            <i class="fe fe-edit dropdown-item-icon"></i>Editar
+                                        </a>
+                                        {% if not l.en_uso %}
+                                        <a class="dropdown-item" href="javascript:void(0);"
+                                           onclick="eliminarajax('{{ l.pk|encrypt }}','{{ l }}','deltorneo')">
+                                            <i class="fe fe-trash dropdown-item-icon"></i>Eliminar
+                                        </a>
+                                        {% endif %}
+                                      </span>
+                                    </span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No existen registros</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <!-- Pagination -->
+                    {% include 'paginador.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

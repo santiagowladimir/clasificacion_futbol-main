@@ -1,0 +1,118 @@
+{% load extra_tags %}
+{% load static %}
+<input type="hidden" name="id" value="{{ id|encrypt }}"/>
+<input type="hidden" name="idp" value="{{ idp|encrypt }}"/>
+<input type="hidden" name="action" value="{{ action }}"/>
+<style>
+      .select2-container--open .select2-dropdown {
+            z-index: 1070;
+        }
+</style>
+{% block header_modal %}{% endblock %}
+<div class="alert alert-danger d-flex align-items-center d-none" id="text-alerta" role="alert">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+         class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16">
+        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+    </svg>
+    <div id="message_top">
+    </div>
+</div>
+{% block section_form %}
+    {% if seccionado %}
+        <div class="col-12">
+            <div class="row">
+               <div class="col-lg-6">
+                <div class="row">
+                    {% include 'section_ajaxformmodal.html' %}
+                </div>
+                {% block extra_input_seccion %}{% endblock %}
+               </div>
+                <div class="col-lg-6">
+                   {% block section_end %}{% endblock %}
+               </div>
+            </div>
+        </div>
+    {% else %}
+        {% include 'section_ajaxformmodal.html' %}
+    {% endif %}
+{% endblock %}
+{% block extra_input_modal %}{% endblock %}
+{% block footer_modal %}
+    <div class="col-12 text-center mt-4">
+        <button type="submit" id="submit" class="btn btn-success rounded-pill btn-xs bloqueo"><i class="fas fa-check-circle"></i>
+        Guardar
+    </button>
+        <a href="javascript:void(0);" class="btn btn-secondary rounded-pill btn-xs" data-bs-dismiss="modal" ><i
+            class="fa fa-times-circle"></i> Cerrar</a>
+    </div>
+{% endblock %}
+<script>
+    $(function () {
+        $('.select2').select2({width: '100%', minimumResultsForSearch: 6})
+        {#$("#contentForm .select2").select2({width: '100%', placeholder: 'Seleccione una opción...', minimumResultsForSearch: 15})#}
+
+    });
+
+    function cargarSelectSecundario(action, objeto_p, objeto_s, url) {
+        objeto_p.on("select2:select", function (evt) {
+            // Realizar la consulta AJAX utilizando el valor seleccionado
+            cargarLista(action, objeto_p, objeto_s, '', '', url)
+        });
+    }
+
+    // Codependiente para cargar select secundario
+    function cargarLista(action, objeto_p, objeto_s, id = '', args = '', url = '{{ request.path }}') {
+        bloqueointerface()
+        let value = objeto_p.val();
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {'id': value, 'action': action, 'args': args},
+            success: function (response) {
+                $.unblockUI();
+                // Limpiar el select secundario
+                objeto_s.empty();
+
+                // Llenar el select secundario con las opciones de la respuesta de la consulta AJAX
+                $.each(response.data, function (index, option) {
+                    objeto_s.append($('<option>').text(option.text).val(option.value));
+                });
+
+                // Actualizar el select secundario con las nuevas opciones
+                objeto_s.val(id).trigger('change');
+            },
+            error: function (xhr, status, error) {
+                $.unblockUI();
+                // Manejar el error de la consulta AJAX si es necesario
+            }
+        });
+    }
+
+        // Permite realizar funcionalidad a input tipo text con diseño para ingreso de datos solo numéricos ****
+    function consultaAjax(value, action, url = '{{ request.path }}', args='') {
+        bloqueointerface()
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {'value': value,'args':args, 'action': action},
+            success: function (response) {
+                $.unblockUI();
+                if (response.results === false){
+                    mensajeDanger(response.mensaje)
+                }else{
+                    consultaAjaxResponse(response)
+                }
+            },
+            error: function (xhr, status, error) {
+                $.unblockUI();
+                alertaDanger('Error de conexión')
+                // Manejar el error de la consulta AJAX si es necesario
+            }
+        });
+    }
+
+</script>
+<script type="text/javascript" src="{% static 'js/formquestion.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/validators.js' %}"></script>
+{% block extra_js_modal %}{% endblock %}
+
