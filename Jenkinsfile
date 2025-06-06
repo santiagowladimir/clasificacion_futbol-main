@@ -1,6 +1,7 @@
 pipeline {
     agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
 
+    stages {
         stage('Levantar Servicios Docker Compose') { // Etapa renombrada para mayor claridad
             steps {
                 echo 'Construyendo y levantando servicios con Docker Compose...'
@@ -19,7 +20,7 @@ pipeline {
                 }
             }
         }
-
+    }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
     post {
         always {
