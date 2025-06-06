@@ -1,16 +1,6 @@
 pipeline {
     agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
 
-    stages {
-        stage('Checkout de Código') {
-            steps {
-                echo 'Clonando el repositorio Git...'
-                // Reemplaza 'https://github.com/tu_usuario/tu_repositorio.git' con la URL real de tu repositorio.
-                // Si el repositorio es privado, asegúrate de tener las credenciales configuradas en Jenkins.
-                git 'https://github.com/santiagowladimir/clasificacion_futbol-main.git' // 
-            }
-        }
-
         stage('Levantar Servicios Docker Compose') { // Etapa renombrada para mayor claridad
             steps {
                 echo 'Construyendo y levantando servicios con Docker Compose...'
