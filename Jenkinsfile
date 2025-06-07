@@ -48,7 +48,7 @@ pipeline {
         stage('Crear Superusuario Django') {
             steps {
                 echo 'Creando superusuario de Django (solo si no existe o para desarrollo)...'
-                echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', '1234')" | python manage.py shell
+                sh "docker-compose exec web sh -c \"echo \\\"from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', '12345678')\\\" | python manage.py shell\""
             }
         }
     }
