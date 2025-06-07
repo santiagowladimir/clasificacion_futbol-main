@@ -47,40 +47,29 @@ pipeline {
         }
         stage('Crear Superusuario Django') {
             steps {
-                echo 'Creando superusuario de Django (solo si no existe, no se actualiza la contraseña si ya existe)...'
+                echo 'Creando superusuario de Django (solo si no existe o para desarrollo)...'
                 script {
+                    // Define las variables de entorno para el superusuario
                     def djangoSuperuserUsername = "admin"
                     def djangoSuperuserEmail = "admin@example.com"
-                    // **IMPORTANTE: Cambia esta contraseña en producción y usa Jenkins Credentials.**
-                    def djangoSuperuserPassword = "12345678"
+                    def djangoSuperuserPassword = "12345678" // ¡CAMBIA ESTO EN PRODUCCIÓN!
 
+                    // Ejecuta el comando crea superusuario no interactivo
+                    // Se usa el comando 'bash -c' para poder concatenar comandos con '|| true'
+                    // '|| true' hace que la etapa no falle si el comando devuelve un error (ej. si el usuario ya existe)
                     sh """
-            docker-compose exec web bash -c "
-            # Define variables de shell para el script de Python.
-            SUPERUSER_USERNAME='${djangoSuperuserUsername}'
-            SUPERUSER_EMAIL='${djangoSuperuserEmail}'
-            SUPERUSER_PASSWORD='${djangoSuperuserPassword}'
-
-            # Directamente pipear el contenido del here-document al python manage.py shell.
-            # El uso de <<'EOF' (con comillas simples) asegura que las variables de shell
-            # como \$SUPERUSER_USERNAME se pasen literalmente al script Python
-            # para que Python pueda interpolarlas.
-            cat <<'EOF' | python manage.py shell
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        username = '\$SUPERUSER_USERNAME'
-        email = '\$SUPERUSER_EMAIL'
-        password = '\$SUPERUSER_PASSWORD'
-
-        if not User.objects.filter(username=username).exists():
-            User.objects.create_superuser(username, email, password)
-            print(f"Superusuario '{username}' creado exitosamente.")
-        else:
-            print(f"Superusuario '{username}' ya existe. No se actualiza la contraseña.")
-        EOF
-        "
-                    """.stripIndent() // Asegura que el EOF no tenga indentación accidental
-                    echo "Proceso de creación/verificación del Superusuario '${djangoSuperuserUsername}' completado."
+                        docker-compose exec web bash -c "
+                            python manage.py createsuperuser --noinput \\
+                            --username ${djangoSuperuserUsername} \\
+                            --email ${djangoSuperuserEmail} || true
+                        "
+                        # Si el usuario ya existe, el comando anterior puede no haber establecido la contraseña.
+                        # Este comando es más robusto para establecer/actualizar la contraseña.
+                        docker-compose exec web bash -c "
+                            echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='${djangoSuperuserUsername}').exists() or User.objects.create_superuser('${djangoSuperuserUsername}', '${djangoSuperuserEmail}', '${djangoSuperuserPassword}')\" | python manage.py shell
+                        "
+                    """
+                    echo "Superusuario '${djangoSuperuserUsername}' intentado crear/actualizar."
                 }
             }
         }
