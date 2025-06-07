@@ -49,27 +49,52 @@ pipeline {
             steps {
                 echo 'Creando superusuario de Django (solo si no existe o para desarrollo)...'
                 script {
-                    // Define las variables de entorno para el superusuario
                     def djangoSuperuserUsername = "admin"
                     def djangoSuperuserEmail = "admin@example.com"
-                    def djangoSuperuserPassword = "12345678" // ¡CAMBIA ESTO EN PRODUCCIÓN!
+                    // **IMPORTANTE: Cambia esta contraseña en producción y usa Jenkins Credentials.**
+                    def djangoSuperuserPassword = "12345678"
 
-                    // Ejecuta el comando crea superusuario no interactivo
-                    // Se usa el comando 'bash -c' para poder concatenar comandos con '|| true'
-                    // '|| true' hace que la etapa no falle si el comando devuelve un error (ej. si el usuario ya existe)
                     sh """
+                        # Comando para crear superusuario sin interacción (si no existe)
                         docker-compose exec web bash -c "
                             python manage.py createsuperuser --noinput \\
                             --username ${djangoSuperuserUsername} \\
                             --email ${djangoSuperuserEmail} || true
                         "
-                        # Si el usuario ya existe, el comando anterior puede no haber establecido la contraseña.
-                        # Este comando es más robusto para establecer/actualizar la contraseña.
+
+                        # Comando robusto para establecer/actualizar la contraseña
+                        # Escapamos la contraseña para el shell y para el script de Python.
+                        # Es crucial que la contraseña se pase como un literal de cadena a Python.
                         docker-compose exec web bash -c "
-                            echo \"from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(username='${djangoSuperuserUsername}').exists() or User.objects.create_superuser('${djangoSuperuserUsername}', '${djangoSuperuserEmail}', '${djangoSuperuserPassword}')\" | python manage.py shell
-                        "
-                    """
-                    echo "Superusuario '${djangoSuperuserUsername}' intentado crear/actualizar."
+                            SUPERUSER_USERNAME='${djangoSuperuserUsername}'
+                            SUPERUSER_EMAIL='${djangoSuperuserEmail}'
+                            SUPERUSER_PASSWORD='${djangoSuperuserPassword}'
+
+                            # Script Python para ejecutar en manage.py shell
+                            PYTHON_SCRIPT=\$(cat <<EOF
+                        from django.contrib.auth import get_user_model
+                        User = get_user_model()
+                        username = '$SUPERUSER_USERNAME'
+                        email = '$SUPERUSER_EMAIL'
+                        password = '$SUPERUSER_PASSWORD'
+
+                        if not User.objects.filter(username=username).exists():
+                            User.objects.create_superuser(username, email, password)
+                        else:
+                            # Opcional: Si el usuario ya existe y quieres actualizar su contraseña
+                            user = User.objects.get(username=username)
+                            if not user.check_password(password): # Solo actualiza si la contraseña es diferente
+                                user.set_password(password)
+                                user.save()
+                                print(f"Contraseña para {username} actualizada.")
+                            else:
+                                print(f"Usuario {username} ya existe con la misma contraseña.")
+                        EOF
+                        )
+                                            echo "\$PYTHON_SCRIPT" | python manage.py shell
+                                        "
+                                    """
+                                    echo "Superusuario '${djangoSuperuserUsername}' intentado crear/actualizar."
                 }
             }
         }
