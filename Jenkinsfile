@@ -55,19 +55,17 @@ pipeline {
                     def djangoSuperuserPassword = "12345678"
 
                     sh """
-                        docker-compose exec web bash -c "
-                            # Define variables de shell para el script de Python.
-                            # Estas variables serán accesibles dentro de este bash -c "..."
-                            SUPERUSER_USERNAME='${djangoSuperuserUsername}'
-                            SUPERUSER_EMAIL='${djangoSuperuserEmail}'
-                            SUPERUSER_PASSWORD='${djangoSuperuserPassword}'
+            docker-compose exec web bash -c "
+            # Define variables de shell para el script de Python.
+            SUPERUSER_USERNAME='${djangoSuperuserUsername}'
+            SUPERUSER_EMAIL='${djangoSuperuserEmail}'
+            SUPERUSER_PASSWORD='${djangoSuperuserPassword}'
 
-                            # Script Python para ejecutar en manage.py shell
-                            # Utilizamos '\$' para que Groovy no intente interpolar estas variables.
-                            # El shell las interpretará correctamente después de que Groovy haya procesado la cadena.
-                            # NOTA: Se usa <<'EOF' (con comillas simples) para evitar la expansión de variables de shell
-                            # dentro del script Python antes de que llegue a Python.
-                            PYTHON_SCRIPT=\$(cat <<'EOF'
+            # Directamente pipear el contenido del here-document al python manage.py shell.
+            # El uso de <<'EOF' (con comillas simples) asegura que las variables de shell
+            # como \$SUPERUSER_USERNAME se pasen literalmente al script Python
+            # para que Python pueda interpolarlas.
+            cat <<'EOF' | python manage.py shell
         from django.contrib.auth import get_user_model
         User = get_user_model()
         username = '\$SUPERUSER_USERNAME'
@@ -80,10 +78,8 @@ pipeline {
         else:
             print(f"Superusuario '{username}' ya existe. No se actualiza la contraseña.")
         EOF
-        )
-                            echo "\$PYTHON_SCRIPT" | python manage.py shell
-                        "
-                    """.stripIndent() // <--- ¡La clave para corregir el error!
+        "
+                    """.stripIndent() // Asegura que el EOF no tenga indentación accidental
                     echo "Proceso de creación/verificación del Superusuario '${djangoSuperuserUsername}' completado."
                 }
             }
