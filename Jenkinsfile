@@ -39,6 +39,8 @@ pipeline {
                 sh 'docker-compose exec web python manage.py migrate'
                 // O si también necesitas makemigrations si hay cambios en el modelo
                 sh 'docker-compose exec web python manage.py makemigrations'
+                sh 'docker-compose exec web python manage.py makemigrations clubes'
+                sh 'docker-compose exec web python manage.py makemigrations users'
                 sh 'docker-compose exec web python manage.py migrate'
             }
         }
