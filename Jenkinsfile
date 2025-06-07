@@ -58,12 +58,29 @@ pipeline {
                     // Se usa el comando 'bash -c' para poder concatenar comandos con '|| true'
                     // '|| true' hace que la etapa no falle si el comando devuelve un error (ej. si el usuario ya existe)
                     sh """
-                        docker-compose exec web bash -c "
-                            python manage.py createsuperuser --noinput \\
-                            --username ${djangoSuperuserUsername} \\
-                            --email ${djangoSuperuserEmail} \\
-                            --password ${djangoSuperuserPassword}|| true
-                        "
+                    docker-compose exec web bash -c "
+                    SUPERUSER_USERNAME='${djangoSuperuserUsername}'
+                    SUPERUSER_EMAIL='${djangoSuperuserEmail}'
+                    SUPERUSER_PASSWORD='${djangoSuperuserPassword}'
+
+                    # Script Python para ejecutar en manage.py shell
+                    # Solo crea el superusuario si no existe. No lo actualiza si ya existe.
+                    PYTHON_SCRIPT=\$(cat <<EOF
+from django.contrib.auth import get_user_model
+User = get_user_model()
+username = '$SUPERUSER_USERNAME'
+email = '$SUPERUSER_EMAIL'
+password = '$SUPERUSER_PASSWORD'
+
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username, email, password)
+    print(f"Superusuario '{username}' creado exitosamente.")
+else:
+    print(f"Superusuario '{username}' ya existe. No se actualiza la contraseña.")
+EOF
+)
+                    echo "\$PYTHON_SCRIPT" | python manage.py shell
+                "
                     """
                     echo "Superusuario '${djangoSuperuserUsername}' intentado crear/actualizar."
                 }
