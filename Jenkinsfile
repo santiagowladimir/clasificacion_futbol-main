@@ -61,7 +61,8 @@ pipeline {
                         docker-compose exec web bash -c "
                             python manage.py createsuperuser --noinput \\
                             --username ${djangoSuperuserUsername} \\
-                            --email ${djangoSuperuserEmail} || true
+                            --email ${djangoSuperuserEmail} \\
+                            --password ${djangoSuperuserPassword}|| true
                         "
                     """
                     echo "Superusuario '${djangoSuperuserUsername}' intentado crear/actualizar."
