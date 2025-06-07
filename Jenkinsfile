@@ -88,6 +88,7 @@ pipeline {
                 }
             }
         }
+    }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
     post {
         always {
@@ -100,5 +101,4 @@ pipeline {
             echo 'El pipeline se ejecutó exitosamente.'
         }
     }
-}
 }
