@@ -45,8 +45,7 @@ pipeline {
                 sh 'docker-compose exec web python manage.py migrate'
             }
         }
-    }
-    stage('Crear Superusuario Django') {
+        stage('Crear Superusuario Django') {
             steps {
                 echo 'Creando superusuario de Django (solo si no existe o para desarrollo)...'
                 script {
@@ -74,6 +73,7 @@ pipeline {
                 }
             }
         }
+    }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
     post {
         always {
