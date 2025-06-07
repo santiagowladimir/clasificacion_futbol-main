@@ -26,7 +26,7 @@ pipeline {
                     // La opción '--build' asegura que las imágenes se reconstruyan si el Dockerfile ha cambiado.
                     sh 'docker-compose up -d --build'
 
-                    echo 'Servicios Docker Compose levantados. Prueba esperando unos 15 segundos para su inicialización...'
+                    echo 'Servicios Docker Compose levantados. Prueba final esperando unos 15 segundos para su inicialización...'
                     // Esto es una pausa simple. En producción, considera health checks más robustos.
                     sh 'sleep 45' // Ajusta el tiempo según lo que tarden tus servicios en arrancar.
                 }
