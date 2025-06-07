@@ -28,7 +28,7 @@ pipeline {
 
                     echo 'Servicios Docker Compose levantados. Prueba esperando unos 15 segundos para su inicialización...'
                     // Esto es una pausa simple. En producción, considera health checks más robustos.
-                    sh 'sleep 15' // Ajusta el tiempo según lo que tarden tus servicios en arrancar.
+                    sh 'sleep 45' // Ajusta el tiempo según lo que tarden tus servicios en arrancar.
                 }
             }
         }
