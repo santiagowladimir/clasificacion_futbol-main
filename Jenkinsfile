@@ -65,7 +65,9 @@ pipeline {
                             # Script Python para ejecutar en manage.py shell
                             # Utilizamos '\$' para que Groovy no intente interpolar estas variables.
                             # El shell las interpretará correctamente después de que Groovy haya procesado la cadena.
-                            PYTHON_SCRIPT=\$(cat <<EOF
+                            # NOTA: Se usa <<'EOF' (con comillas simples) para evitar la expansión de variables de shell
+                            # dentro del script Python antes de que llegue a Python.
+                            PYTHON_SCRIPT=\$(cat <<'EOF'
         from django.contrib.auth import get_user_model
         User = get_user_model()
         username = '\$SUPERUSER_USERNAME'
@@ -81,12 +83,11 @@ pipeline {
         )
                             echo "\$PYTHON_SCRIPT" | python manage.py shell
                         "
-                    """
+                    """.stripIndent() // <--- ¡La clave para corregir el error!
                     echo "Proceso de creación/verificación del Superusuario '${djangoSuperuserUsername}' completado."
                 }
             }
         }
-    }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
     post {
         always {
