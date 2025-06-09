@@ -82,7 +82,7 @@ DATABASES = {
         'NAME': 'db_futbol',
         'USER':'postgres',
         'PASSWORD':'1234',
-        'HOST':'172.31.86.47',
+        'HOST':'localhost',
         'PORT':'5432',
     }
 }
