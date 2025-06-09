@@ -70,13 +70,13 @@ class SignupForm(FormBaseUser):
         data = super().clean()
         password = data['password']
         password_confirmation = data['password_confirmation']
-        if 'cedula' in data and 'email' in data:
-            cedula = data['cedula']
-            email = data['email']
-            ua=UsuariosAcceso.objects.filter(cedula=cedula, email=email, status=True).exists()
-            if not ua:
-                self.add_error('cedula','Usuario con los datos proporcionado no tienen permiso de registro')
-                self.add_error('email','Usuario con los datos proporcionado no tienen permiso de registro')
+        # if 'cedula' in data and 'email' in data:
+        #     cedula = data['cedula']
+        #     email = data['email']
+        #     ua=UsuariosAcceso.objects.filter(cedula=cedula, email=email, status=True).exists()
+        #     if not ua:
+        #         self.add_error('cedula','Usuario con los datos proporcionado no tienen permiso de registro')
+        #         self.add_error('email','Usuario con los datos proporcionado no tienen permiso de registro')
         if len(password) >= 6:
             if password.islower() or password.isupper():
                 msg = "La contraseña tiene que tener por lo menos 1 letra mayuscula y 1 minuscula"
