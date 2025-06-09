@@ -8,7 +8,7 @@ pipeline {
                 script {
                     // Navegar al directorio donde se encuentra tu docker-compose.yml si no está en la raíz del repositorio.
                     // Por ejemplo, si está en una subcarpeta 'docker/':
-                    sh 'cd /home/docker-server/jenkins/jenkins/workspace/clasificacion-futbol-main'                
+                    sh 'cd /home/docker-server/jenkins/jenkins/workspace/clf'                
                     sh 'docker-compose down -v'
                     sh 'sleep 15' // Ajusta el tiempo según lo que tarden tus servicios en arrancar.
                 }
@@ -20,7 +20,7 @@ pipeline {
                 script {
                     // Navegar al directorio donde se encuentra tu docker-compose.yml si no está en la raíz del repositorio.
                     // Por ejemplo, si está en una subcarpeta 'docker/':
-                    sh 'cd /home/docker-server/jenkins/jenkins/workspace/clasificacion-futbol-main'
+                    sh 'cd /home/docker-server/jenkins/jenkins/workspace/clf'
 
                     // Ejecuta docker-compose up para construir y levantar los servicios en segundo plano.
                     // La opción '--build' asegura que las imágenes se reconstruyan si el Dockerfile ha cambiado.
