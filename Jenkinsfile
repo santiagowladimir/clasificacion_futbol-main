@@ -51,6 +51,26 @@ pipeline {
                 sh "docker-compose exec web sh -c \"echo \\\"from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', '12345678')\\\" | python manage.py shell\""
             }
         }
+         stage('Análisis SonarQube') {
+            steps {
+                script {
+                    // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
+                    withSonarQubeEnv('Mi SonarQube') {
+                        // Comando para ejecutar el SonarScanner
+                        sh 'sonar-scanner ' +
+                           '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
+                           '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
+                           '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
+                           '-Dsonar.host.url=http://172.31.38.42:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
+                           '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
+                           '-Dsonar.sourceEncoding=UTF-8 ' +
+                           '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
+                           '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
+                           '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
+                    }
+                }
+            }
+        }
     }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
     post {
