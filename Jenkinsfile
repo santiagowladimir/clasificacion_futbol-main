@@ -60,7 +60,7 @@ pipeline {
             steps {
                 script {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
-                    withSonarQubeEnv('Mi SonarQube') {
+                    withSonarQubeEnv('Qube') {
                         // Comando para ejecutar el SonarScanner
                         sh 'sonar-scanner ' +
                            '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
