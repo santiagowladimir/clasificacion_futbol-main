@@ -57,16 +57,18 @@ pipeline {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
                     def sonarScannerHome = tool 'Qube'
                         // Comando para ejecutar el SonarScanner
-                    sh "${sonarScannerHome}/bin/sonar-scanner " +
-                        '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
-                        '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
-                        '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
-                        '-Dsonar.host.url=http://3.92.169.236:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
-                        '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
-                        '-Dsonar.sourceEncoding=UTF-8 ' +
-                        '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
-                        '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
-                        '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
+                    sh '''
+                    /home/docker-server/jenkins/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/Qube/bin/sonar-scanner \
+                    -Dsonar.projectKey=mi_proyecto_django \
+                    -Dsonar.projectName="Mi Proyecto Django" \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://3.92.169.236:9000 \
+                    -Dsonar.python.version=3.10 \
+                    -Dsonar.sourceEncoding=UTF-8 \
+                    -Dsonar.python.xunit.reportPath=results/junit.xml \
+                    -Dsonar.python.coverage.reportPaths=results/coverage.xml \
+                    -Dsonar.login=${SONAR_AUTH_TOKEN}
+                    '''
                 }
             }        
         }
