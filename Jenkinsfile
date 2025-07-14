@@ -1,6 +1,15 @@
 pipeline {
     agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
-
+    environment {
+        // Variables de SonarQube
+        // Asegúrate de que 'Qube' es el nombre del SonarQube Scanner configurado en Jenkins
+        SONARQUBE_URL = 'http://3.92.169.236:9000' // Tu URL de SonarQube
+        SONARQUBE_PROJECT_KEY = 'TFM' // Clave de tu proyecto en SonarQube
+        SONARQUBE_PROJECT_NAME = 'TFM' // Nombre visible en SonarQube
+        PYTHON_VERSION = '3.10' // Versión de Python de tu proyecto
+        // Asegúrate de que 'sonarqube-token' es el ID de la credencial de Jenkins donde guardaste tu token de SonarQube
+        SONARQUBE_LOGIN_CREDENTIAL_ID = 'gene-token'
+    }
     stages {
         stage('Detener servicios anteriores') { // Etapa renombrada para mayor claridad
             steps {
@@ -57,16 +66,18 @@ pipeline {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
                     def sonarScannerHome = tool 'Qube'
                         // Comando para ejecutar el SonarScanner
-                    sh "${sonarScannerHome}/bin/sonar-scanner " +
-                        '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
-                        '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
-                        '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
-                        '-Dsonar.host.url=http://3.92.169.236:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
-                        '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
-                        '-Dsonar.sourceEncoding=UTF-8 ' +
-                        '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
-                        '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
-                        '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
+                    withCredentials([string(credentialsId: "${SONARQUBE_LOGIN_CREDENTIAL_ID}", variable: 'SONAR_AUTH_TOKEN')]) {
+                        sh "${sonarScannerHome}/bin/sonar-scanner " +
+                            "-Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} " +
+                            "-Dsonar.projectName=${SONARQUBE_PROJECT_NAME} " +
+                            "-Dsonar.sources=. " +
+                            "-Dsonar.host.url=${SONARQUBE_URL} " +
+                            "-Dsonar.python.version=${PYTHON_VERSION} " +
+                            "-Dsonar.sourceEncoding=UTF-8 " +
+                            "-Dsonar.python.xunit.reportPaths=results/junit.xml " +
+                            "-Dsonar.python.coverage.reportPaths=results/coverage.xml " +
+                            "-Dsonar.login=${SONAR_AUTH_TOKEN}" // Token de autenticación, inyectado por Jenkins
+                    }
                 }    
             }        
         }
