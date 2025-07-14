@@ -2,8 +2,8 @@ pipeline {
     agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
     
     tools {
-        // Asegúrate de que 'SonarScanner_CLI' 
-        hudson.plugins.sonar.SonarRunnerInstallation 'Qube'
+        // Asegurar la instalación del agente 'SonarScanner' 
+        sonarScanner 'Qube'
     }
 
     stages {
@@ -60,7 +60,7 @@ pipeline {
             steps {
                 script {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
-                    withSonarQubeEnv('Qube') {
+                    withSonarQubeEnv('Mi SonarQube') {
                         // Comando para ejecutar el SonarScanner
                         sh 'sonar-scanner ' +
                            '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
