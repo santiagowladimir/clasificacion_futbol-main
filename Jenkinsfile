@@ -57,19 +57,21 @@ pipeline {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
                     def sonarScannerHome = tool 'Qube'
                         // Comando para ejecutar el SonarScanner
-                    sh '''
-                    /home/docker-server/jenkins/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/Qube/bin/sonar-scanner \
-                    -Dsonar.projectKey=mi_proyecto_django \
-                    -Dsonar.projectName="Mi Proyecto Django" \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://3.81.186.3:9000 \
-                    -Dsonar.python.version=3.10 \
-                    -Dsonar.sourceEncoding=UTF-8 \
-                    -Dsonar.python.xunit.reportPath=results/junit.xml \
-                    -Dsonar.python.coverage.reportPaths=results/coverage.xml \
-                    -Dsonar.login=${SONAR_AUTH_TOKEN} \
-                    -Dsonar.scanner.java.opts="--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.regex=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED"
-                    '''
+                    def scannerCommand = """
+                        /home/docker-server/jenkins/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/Qube/bin/sonar-scanner \\
+                        -Dsonar.projectKey=mi_proyecto_django \\
+                        -Dsonar.projectName="Mi Proyecto Django" \\
+                        -Dsonar.sources=. \\
+                        -Dsonar.host.url=http://3.81.186.3:9000 \\
+                        -Dsonar.python.version=3.10 \\
+                        -Dsonar.sourceEncoding=UTF-8 \\
+                        -Dsonar.python.xunit.reportPath=results/junit.xml \\
+                        -Dsonar.python.coverage.reportPaths=results/coverage.xml \\
+                        -Dsonar.login=${SONAR_AUTH_TOKEN} \\
+                        -Dsonar.scanner.java.opts="--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.regex=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED"
+                    """
+                    echo "Executing SonarScanner command:\n${scannerCommand}"
+                    sh scannerCommand.stripIndent() // stripIndent elimina el espacio en blanco extra de las triples comillas
                 }
             }        
         }
