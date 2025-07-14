@@ -3,7 +3,7 @@ pipeline {
     
     tools {
         // Asegurar la instalación del agente 'SonarScanner' 
-        hudson.plugins.sonar.SonarRunnerInstallation 'Qube'
+        tool name: 'Qube', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     }
 
     stages {
