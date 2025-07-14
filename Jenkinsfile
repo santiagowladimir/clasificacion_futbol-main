@@ -67,9 +67,8 @@ pipeline {
                         '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
                         '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
                         '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
-                    }
                 }
-            }
+            }        
         }
     }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
