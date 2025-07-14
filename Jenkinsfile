@@ -61,7 +61,7 @@ pipeline {
                            '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
                            '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
                            '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
-                           '-Dsonar.host.url=http://172.31.38.42:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
+                           '-Dsonar.host.url=http://localhost:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
                            '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
                            '-Dsonar.sourceEncoding=UTF-8 ' +
                            '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
