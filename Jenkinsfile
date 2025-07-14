@@ -3,7 +3,7 @@ pipeline {
     
     tools {
         // Asegúrate de que 'SonarScanner_CLI' 
-        sonarScanner 'Qube' 
+        hudson.plugins.sonar.SonarRunnerInstallation 'Qube'
     }
 
     stages {
