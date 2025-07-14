@@ -1,10 +1,5 @@
 pipeline {
     agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
-    
-    tools {
-        // Asegurar la instalación del agente 'SonarScanner' 
-        tool name: 'Qube', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-    }
 
     stages {
         stage('Detener servicios anteriores') { // Etapa renombrada para mayor claridad
@@ -60,18 +55,18 @@ pipeline {
             steps {
                 script {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
-                    withSonarQubeEnv('Mi SonarQube') {
+                    def sonarScannerHome = tool 'Qube'
                         // Comando para ejecutar el SonarScanner
-                        sh 'sonar-scanner ' +
-                           '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
-                           '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
-                           '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
-                           '-Dsonar.host.url=http://3.92.169.236:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
-                           '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
-                           '-Dsonar.sourceEncoding=UTF-8 ' +
-                           '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
-                           '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
-                           '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
+                    sh "${sonarScannerHome}/bin/sonar-scanner " +
+                        '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
+                        '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
+                        '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
+                        '-Dsonar.host.url=http://3.92.169.236:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
+                        '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
+                        '-Dsonar.sourceEncoding=UTF-8 ' +
+                        '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
+                        '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
+                        '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
                     }
                 }
             }
