@@ -1,5 +1,10 @@
 pipeline {
     agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
+    
+    tools {
+        // Asegúrate de que 'SonarScanner_CLI' 
+        sonarScanner 'Qube' 
+    }
 
     stages {
         stage('Detener servicios anteriores') { // Etapa renombrada para mayor claridad
