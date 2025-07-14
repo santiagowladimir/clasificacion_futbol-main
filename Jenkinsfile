@@ -62,12 +62,13 @@ pipeline {
                     -Dsonar.projectKey=mi_proyecto_django \
                     -Dsonar.projectName="Mi Proyecto Django" \
                     -Dsonar.sources=. \
-                    -Dsonar.host.url=http://3.92.169.236:9000 \
+                    -Dsonar.host.url=http://3.81.186.3:9000 \
                     -Dsonar.python.version=3.10 \
                     -Dsonar.sourceEncoding=UTF-8 \
                     -Dsonar.python.xunit.reportPath=results/junit.xml \
                     -Dsonar.python.coverage.reportPaths=results/coverage.xml \
-                    -Dsonar.login=${SONAR_AUTH_TOKEN}
+                    -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                    -Dsonar.scanner.java.opts="--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.regex=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED"
                     '''
                 }
             }        
