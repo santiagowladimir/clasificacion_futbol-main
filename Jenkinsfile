@@ -54,28 +54,19 @@ pipeline {
         stage('Análisis SonarQube') {
             steps {
                 script {
-                    withSonarQubeEnv('Qube') {
-                    // Establece la variable de entorno para la JVM del scanner
-                    // Puedes probar con JAVA_OPTS o SONAR_SCANNER_OPTS
-                    // SONAR_SCANNER_OPTS es más específico y preferible si funciona
-                    // Ten cuidado con las comillas y escapado si pones esto en 'sh """'
-                    // Para simplificar, podemos usar 'withEnv'
-                        withEnv(["SONAR_SCANNER_OPTS=--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.regex=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED"]) {
-                            sh """
-                                /home/docker-server/jenkins/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/Qube/bin/sonar-scanner \\
-                                -Dsonar.projectKey=mi_proyecto_django \\
-                                -Dsonar.projectName="Mi Proyecto Django" \\
-                                -Dsonar.sources=. \\
-                                -Dsonar.host.url=http://3.81.186.3:9000 \\
-                                -Dsonar.python.version=3.10 \\
-                                -Dsonar.sourceEncoding=UTF-8 \\
-                                -Dsonar.python.xunit.reportPath=results/junit.xml \\
-                                -Dsonar.python.coverage.reportPaths=results/coverage.xml \\
-                                -Dsonar.login=\${SONAR_AUTH_TOKEN}
-                                // Quita la línea -Dsonar.scanner.java.opts de aquí si la pones en withEnv
-                            """
-                        }
-                    }
+                    // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
+                    def sonarScannerHome = tool 'Qube'
+                        // Comando para ejecutar el SonarScanner
+                    sh "${sonarScannerHome}/bin/sonar-scanner " +
+                        '-Dsonar.projectKey=mi_proyecto_django ' + // Clave única para tu proyecto en SonarQube
+                        '-Dsonar.projectName=Mi Proyecto Django ' + // Nombre visible en SonarQube
+                        '-Dsonar.sources=. ' + // Directorio raíz de tu código fuente
+                        '-Dsonar.host.url=http://3.92.169.236:9000 ' + // URL del servidor SonarQube desde el contenedor Jenkins
+                        '-Dsonar.python.version=3.10 ' + // Ajusta a la versión de Python de tu proyecto
+                        '-Dsonar.sourceEncoding=UTF-8 ' +
+                        '-Dsonar.python.xunit.reportPath=results/junit.xml ' + // Ruta al informe de pruebas JUnit XML
+                        '-Dsonar.python.coverage.reportPaths=results/coverage.xml ' + // Ruta al informe de cobertura Cobertura XML
+                        '-Dsonar.login=${SONAR_AUTH_TOKEN}' // Token de autenticación, inyectado por Jenkins
                 }    
             }        
         }
