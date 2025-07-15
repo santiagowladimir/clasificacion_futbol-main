@@ -3,7 +3,7 @@ pipeline {
     environment {
         // Variables de SonarQube
         // Asegúrate de que 'Qube' es el nombre del SonarQube Scanner configurado en Jenkins
-        SONARQUBE_URL = 'http://54.208.90.215:9000' // Tu URL de SonarQube
+        SONARQUBE_URL = 'http://3.81.234.70:9000' // Tu URL de SonarQube
         SONARQUBE_PROJECT_KEY = 'TFM' // Clave de tu proyecto en SonarQube
         SONARQUBE_PROJECT_NAME = 'TFM' // Nombre visible en SonarQube
         PYTHON_VERSION = '3.10' // Versión de Python de tu proyecto
@@ -82,10 +82,21 @@ pipeline {
                 }    
             }        
         }
-        stage('SonarQube analysis') {
+
+        stage('Quality Gate Check') {
             steps {
-                withSonarQubeEnv() { // Will pick the global server connection you have configured
-                    sh './gradlew sonar'
+                timeout(time: 25, unit: 'MINUTES') {
+                    script {
+                        echo "Waiting for SonarQube Quality Gate status..."
+
+                        def qg = waitForQualityGate()
+
+                        if (qg.status != 'OK') {
+                            error "Pipeline abortado: La Puerta de Calidad de SonarQube falló con estado: ${qg.status}. Detalles en: ${qg.projectStatus.analysisUrl}"
+                        } else {
+                            echo "SonarQube Quality Gate Passed: ${qg.status}"
+                        }
+                    }
                 }
             }
         }
