@@ -65,24 +65,24 @@ pipeline {
             steps {
                 script {
                     // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
-                    def sonarScannerHome = tool 'Qube'
+                    // en 'Manage Jenkins' -> 'Configure System' -> 'SonarQube Servers'
+                    withSonarQubeEnv('sonarqube') { // Usa el nombre de tu conexión SonarQube en Jenkins aquí
+                        def sonarScannerHome = tool 'Qube' // 'Qube' debe ser el nombre del SonarQube Scanner configurado en 'Manage Jenkins' -> 'Global Tool Configuration'
+
                         // Comando para ejecutar el SonarScanner
-                    withCredentials([string(credentialsId: "${SONARQUBE_LOGIN_CREDENTIAL_ID}", variable: 'SONAR_AUTH_TOKEN')]) {
                         sh "${sonarScannerHome}/bin/sonar-scanner " +
                             "-Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} " +
                             "-Dsonar.projectName=${SONARQUBE_PROJECT_NAME} " +
                             "-Dsonar.sources=. " +
-                            "-Dsonar.host.url=${SONARQUBE_URL} " +
                             "-Dsonar.python.version=${PYTHON_VERSION} " +
                             "-Dsonar.sourceEncoding=UTF-8 " +
                             "-Dsonar.python.xunit.reportPaths=results/junit.xml " +
-                            "-Dsonar.python.coverage.reportPaths=results/coverage.xml " +
-                            "-Dsonar.login=${SONAR_AUTH_TOKEN}" // Token de autenticación, inyectado por Jenkins
+                            "-Dsonar.python.coverage.reportPaths=results/coverage.xml"
+                            // -Dsonar.host.url y -Dsonar.login son inyectados automáticamente por withSonarQubeEnv
                     }
-                }    
-            }        
+                }
+            }
         }
-
         stage("Quality Gate"){
             steps {
                 script {
