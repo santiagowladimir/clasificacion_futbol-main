@@ -80,8 +80,8 @@ pipeline {
                             "-Dsonar.login=${SONAR_AUTH_TOKEN}" // Token de autenticación, inyectado por Jenkins
                     }
                     timeout(time: 5, unit: 'MINUTES') {
-                            waitForQualityGate abortPipeline: true
-                    }
+                        withSonarQubeEnv('sonarqube') { waitForQualityGate abortPipeline: true } 
+                    } 
                 }    
             }        
         }
