@@ -88,16 +88,8 @@ pipeline {
                 timeout(time: 5, unit: 'MINUTES') {
                     script {
                         echo "Waiting for SonarQube Quality Gate status..."
-                        // Como el análisis se ejecutó dentro de withSonarQubeEnv,
-                        // waitForQualityGate ahora puede encontrar el análisis previo.
-                        // No es necesario especificar 'serverName' si el 'credentialsId'
-                        // del withSonarQubeEnv ya está ligado a un servidor SonarQube específico.
-                        // Sin embargo, por claridad y robustez, es buena práctica mantenerlo si tu
-                        // configuración de Jenkins tiene múltiples servidores SonarQube.
-                        def qg = waitForQualityGate() // O waitForQualityGate serverName: "${SONARQUBE_SERVER_CONFIG_NAME}"
-                        // Si tienes un solo servidor SonarQube configurado en Jenkins y lo asocias a la credencial,
-                        // puedes omitir el 'serverName'. Si tienes varios, es mejor especificarlo.
-                        // Para este ejemplo, podemos usarlo sin serverName si el withSonarQubeEnv ya lo asocia.
+
+                        def qg = waitForQualityGate serverName: "${SONARQUBE_SERVER_CONFIG_NAME}"
 
                         if (qg.status != 'OK') {
                             error "Pipeline abortado: La Puerta de Calidad de SonarQube falló con estado: ${qg.status}. Detalles en: ${qg.projectStatus.analysisUrl}"
