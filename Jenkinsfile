@@ -89,7 +89,7 @@ pipeline {
                     script {
                         echo "Waiting for SonarQube Quality Gate status..."
 
-                        def qg = waitForQualityGate serverName: "${SONARQUBE_SERVER_CONFIG_NAME}"
+                        def qg = waitForQualityGate()
 
                         if (qg.status != 'OK') {
                             error "Pipeline abortado: La Puerta de Calidad de SonarQube falló con estado: ${qg.status}. Detalles en: ${qg.projectStatus.analysisUrl}"
