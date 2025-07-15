@@ -81,6 +81,24 @@ pipeline {
                 }    
             }        
         }
+
+        stage('Quality Gate Check') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') { // Tiempo máximo para esperar la respuesta de SonarQube
+                    script {
+                        echo "Waiting for SonarQube Quality Gate status..."
+                        // 'serverName' debe coincidir con el nombre de tu configuración de servidor SonarQube en Jenkins
+                        def qg = waitForQualityGate serverName: "${SONARQUBE_SERVER_NAME}"
+
+                        if (qg.status != 'OK') {
+                            error "Pipeline abortado: La Puerta de Calidad de SonarQube falló con estado: ${qg.status}. Detalles en: ${qg.projectStatus.analysisUrl}"
+                        } else {
+                            echo "SonarQube Quality Gate Passed: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
     }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
     post {
