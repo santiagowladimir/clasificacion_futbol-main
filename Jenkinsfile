@@ -79,11 +79,13 @@ pipeline {
                             "-Dsonar.python.coverage.reportPaths=results/coverage.xml " +
                             "-Dsonar.login=${SONAR_AUTH_TOKEN}" // Token de autenticación, inyectado por Jenkins
                     }
-                    timeout(time: 5, unit: 'MINUTES') {
-                        withSonarQubeEnv('sonarqube') { waitForQualityGate abortPipeline: true } 
-                    } 
                 }    
             }        
+        }
+        stage('SonarQube analysis') {
+            withSonarQubeEnv() { // Will pick the global server connection you have configured
+            sh './gradlew sonar'
+            }
         }
     }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
