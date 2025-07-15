@@ -79,16 +79,11 @@ pipeline {
                             "-Dsonar.python.coverage.reportPaths=results/coverage.xml " +
                             "-Dsonar.login=${SONAR_AUTH_TOKEN}" // Token de autenticación, inyectado por Jenkins
                     }
+                    timeout(time: 5, unit: 'MINUTES') {
+                            waitForQualityGate abortPipeline: true
+                    }
                 }    
             }        
-        }
-
-        stage('Quality Gate Check') {
-            steps {
-                timeout(time: 5, unit: 'MINUTES') {
-                            waitForQualityGate abortPipeline: true
-                }
-            }
         }
     }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
