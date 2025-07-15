@@ -7,7 +7,7 @@ pipeline {
         SONARQUBE_PROJECT_KEY = 'TFM' // Clave de tu proyecto en SonarQube
         SONARQUBE_PROJECT_NAME = 'TFM' // Nombre visible en SonarQube
         PYTHON_VERSION = '3.10' // Versión de Python de tu proyecto
-        SONARQUBE_SERVER_NAME = 'sonarqube'
+        SONARQUBE_SERVER_CONFIG_NAME = 'sonarqube'
         // Asegúrate de que 'sonarqube-token' es el ID de la credencial de Jenkins donde guardaste tu token de SonarQube
         SONARQUBE_LOGIN_CREDENTIAL_ID = 'gene-token'
     }
