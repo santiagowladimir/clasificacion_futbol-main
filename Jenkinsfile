@@ -16,7 +16,7 @@ pipeline {
         stage('Análisis SonarQube') {
             steps {
                 script {
-                     withSonarQubeEnv('sonarqube') { // Usa el nombre de tu conexión SonarQube en Jenkins aquí
+                     withSonarQubeEnv('sonarqube') { // nombre de la conexión SonarQube en Jenkins aquí
                         def sonarScannerHome = tool 'Qube' // 'Qube' debe ser el nombre del SonarQube Scanner configurado en 'Manage Jenkins' -> 'Global Tool Configuration'
 
                         // Comando para ejecutar el SonarScanner
