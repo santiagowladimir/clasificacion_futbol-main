@@ -3,7 +3,7 @@ pipeline {
     environment {
         // Variables de SonarQube
         // Asegúrate de que 'Qube' es el nombre del SonarQube Scanner configurado en Jenkins
-        SONARQUBE_URL = 'http://3.81.234.70:9000' // Tu URL de SonarQube
+        SONARQUBE_URL = 'http://54.159.84.44:9000' // Tu URL de SonarQube
         SONARQUBE_PROJECT_KEY = 'TFM' // Clave de tu proyecto en SonarQube
         SONARQUBE_PROJECT_NAME = 'TFM' // Nombre visible en SonarQube
         PYTHON_VERSION = '3.10' // Versión de Python de tu proyecto
@@ -11,7 +11,42 @@ pipeline {
         // Asegúrate de que 'sonarqube-token' es el ID de la credencial de Jenkins donde guardaste tu token de SonarQube
         SONARQUBE_LOGIN_CREDENTIAL_ID = 'gene-token'
     }
+    
     stages {
+        stage('Análisis SonarQube') {
+            steps {
+                script {
+                    // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
+                    // en 'Manage Jenkins' -> 'Configure System' -> 'SonarQube Servers'
+                    withSonarQubeEnv('sonarqube') { // Usa el nombre de tu conexión SonarQube en Jenkins aquí
+                        def sonarScannerHome = tool 'Qube' // 'Qube' debe ser el nombre del SonarQube Scanner configurado en 'Manage Jenkins' -> 'Global Tool Configuration'
+
+                        // Comando para ejecutar el SonarScanner
+                        sh "${sonarScannerHome}/bin/sonar-scanner " +
+                            "-Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} " +
+                            "-Dsonar.projectName=${SONARQUBE_PROJECT_NAME} " +
+                            "-Dsonar.sources=. " +
+                            "-Dsonar.python.version=${PYTHON_VERSION} " +
+                            "-Dsonar.sourceEncoding=UTF-8 " +
+                            "-Dsonar.python.xunit.reportPaths=results/junit.xml " +
+                            "-Dsonar.python.coverage.reportPaths=results/coverage.xml"
+                            // -Dsonar.host.url y -Dsonar.login son inyectados automáticamente por withSonarQubeEnv
+                    }
+                }
+            }
+        }
+        stage("Quality Gate"){
+            steps {
+                script {
+                    timeout(time: 1, unit: 'HOURS') {
+                        def qg = waitForQualityGate('sonarqube')
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
         stage('Detener servicios anteriores') { // Etapa renombrada para mayor claridad
             steps {
                 echo 'Deteniendo servicios remanentes...'
@@ -59,40 +94,6 @@ pipeline {
             steps {
                 echo 'Creando superusuario de Django (solo si no existe o para desarrollo)...'
                 sh "docker-compose exec web sh -c \"echo \\\"from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', '12345678')\\\" | python manage.py shell\""
-            }
-        }
-        stage('Análisis SonarQube') {
-            steps {
-                script {
-                    // Asegúrate de que 'Mi SonarQube' es el nombre del servidor SonarQube configurado en Jenkins
-                    // en 'Manage Jenkins' -> 'Configure System' -> 'SonarQube Servers'
-                    withSonarQubeEnv('sonarqube') { // Usa el nombre de tu conexión SonarQube en Jenkins aquí
-                        def sonarScannerHome = tool 'Qube' // 'Qube' debe ser el nombre del SonarQube Scanner configurado en 'Manage Jenkins' -> 'Global Tool Configuration'
-
-                        // Comando para ejecutar el SonarScanner
-                        sh "${sonarScannerHome}/bin/sonar-scanner " +
-                            "-Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} " +
-                            "-Dsonar.projectName=${SONARQUBE_PROJECT_NAME} " +
-                            "-Dsonar.sources=. " +
-                            "-Dsonar.python.version=${PYTHON_VERSION} " +
-                            "-Dsonar.sourceEncoding=UTF-8 " +
-                            "-Dsonar.python.xunit.reportPaths=results/junit.xml " +
-                            "-Dsonar.python.coverage.reportPaths=results/coverage.xml"
-                            // -Dsonar.host.url y -Dsonar.login son inyectados automáticamente por withSonarQubeEnv
-                    }
-                }
-            }
-        }
-        stage("Quality Gate"){
-            steps {
-                script {
-                    timeout(time: 1, unit: 'HOURS') {
-                        def qg = waitForQualityGate('sonarqube')
-                        if (qg.status != 'OK') {
-                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                        }
-                    }
-                }
             }
         }        
     }
