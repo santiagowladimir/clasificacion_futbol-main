@@ -3,7 +3,7 @@ pipeline {
     environment {
         // Variables de SonarQube
         // Asegúrate de que 'Qube' es el nombre del SonarQube Scanner configurado en Jenkins
-        SONARQUBE_URL = 'http://54.159.84.44:9000' // Tu URL de SonarQube
+        SONARQUBE_URL = 'http://54.80.229.143:9000' // Tu URL de SonarQube
         SONARQUBE_PROJECT_KEY = 'TFM' // Clave de tu proyecto en SonarQube
         SONARQUBE_PROJECT_NAME = 'TFM' // Nombre visible en SonarQube
         PYTHON_VERSION = '3.10' // Versión de Python de tu proyecto
