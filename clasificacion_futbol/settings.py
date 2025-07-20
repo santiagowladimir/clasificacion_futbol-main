@@ -75,7 +75,7 @@ WSGI_APPLICATION = 'clasificacion_futbol.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'db_futbol',
         'USER':'postgres',
         'PASSWORD':'1234',
