@@ -1,22 +1,18 @@
 pipeline {
-    agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta de tu nodo.
+    agent { label 'Docker-Servers' } // <-- ¡IMPORTANTE! Reemplaza con la etiqueta del nodo.
     environment {
         // Variables de SonarQube
-        // Asegúrate de que 'Qube' es el nombre del SonarQube Scanner configurado en Jenkins
-        SONARQUBE_PROJECT_KEY = 'TFM' // Clave de tu proyecto en SonarQube
+        SONARQUBE_PROJECT_KEY = 'TFM' // Clave del proyecto en SonarQube
         SONARQUBE_PROJECT_NAME = 'TFM' // Nombre visible en SonarQube
-        PYTHON_VERSION = '3.10' // Versión de Python de tu proyecto
-        SONARQUBE_SERVER_CONFIG_NAME = 'sonarqube'
-        // Asegúrate de que 'sonarqube-token' es el ID de la credencial de Jenkins donde guardaste tu token de SonarQube
-        SONARQUBE_LOGIN_CREDENTIAL_ID = 'gene-token'
+        PYTHON_VERSION = '3.10' // Versión de Python del proyecto
     }
     
     stages {
         stage('Análisis SonarQube') {
             steps {
                 script {
-                     withSonarQubeEnv('sonarqube') { // nombre de la conexión SonarQube en Jenkins aquí
-                        def sonarScannerHome = tool 'Qube' // 'Qube' debe ser el nombre del SonarQube Scanner configurado en 'Manage Jenkins' -> 'Global Tool Configuration'
+                     withSonarQubeEnv('sonarqube') { // nombre de la conexión SonarQube en Jenkins
+                        def sonarScannerHome = tool 'Qube' // 'Nombre del SonarQube Scanner configurado en 'Manage Jenkins' -> 'Global Tool Configuration'
 
                         // Comando para ejecutar el SonarScanner
                         sh "${sonarScannerHome}/bin/sonar-scanner " +
@@ -27,8 +23,6 @@ pipeline {
                             "-Dsonar.sourceEncoding=UTF-8 " +
                             "-Dsonar.python.xunit.reportPaths=results/junit.xml " +
                             "-Dsonar.python.coverage.reportPaths=results/coverage.xml"
-                            
-                            // -Dsonar.host.url y -Dsonar.login son inyectados automáticamente por withSonarQubeEnv
                     }
                 }
             }
@@ -45,27 +39,23 @@ pipeline {
                 }
             }
         }
-        stage('Detener servicios anteriores') { // Etapa renombrada para mayor claridad
+        stage('Detener servicios anteriores') {
             steps {
                 echo 'Deteniendo servicios remanentes...'
                 script {
-                    // Navegar al directorio donde se encuentra tu docker-compose.yml si no está en la raíz del repositorio.
-                    // Por ejemplo, si está en una subcarpeta 'docker/':
+                    // Directorio donde se encuentra el docker-compose.yml.
                     sh 'cd /home/docker-server/jenkins/jenkins/workspace/clasificacion-futbol-main'                
                     sh 'docker-compose down -v'
                 }
             }
         }
-        stage('Levantar Servicios Docker Compose') { // Etapa renombrada para mayor claridad
+        stage('Levantar Servicios Docker Compose') {
             steps {
                 echo 'Construyendo y levantando servicios con Docker Compose...'
                 script {
-                    // Navegar al directorio donde se encuentra tu docker-compose.yml si no está en la raíz del repositorio.
-                    // Por ejemplo, si está en una subcarpeta 'docker/':
+                    // Directorio donde se encuentra el docker-compose.yml
                     sh 'cd /home/docker-server/jenkins/jenkins/workspace/clasificacion-futbol-main'
-
                     // Ejecuta docker-compose up para construir y levantar los servicios en segundo plano.
-                    // La opción '--build' asegura que las imágenes se reconstruyan si el Dockerfile ha cambiado.
                     sh 'docker-compose up -d --build'
                }
             }
