@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex # set -e para salir si un comando falla, set -x para depuración
 
+sleep 20
+
 echo "Running database migrations..."
 python manage.py migrate
 python manage.py makemigrations
