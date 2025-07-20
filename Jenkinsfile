@@ -70,6 +70,12 @@ pipeline {
                     sh 'docker-compose up -d --build'
                }
             }
+        }
+        stage('Crear Superusuario Django') {
+            steps {
+                echo 'Creando superusuario de Django (solo si no existe o para desarrollo)...'
+                sh "docker-compose exec web sh -c \"echo \\\"from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', '12345678')\\\" | python manage.py shell\""
+            }
         }     
     }
   // Bloque post para acciones que se ejecutan al finalizar el pipeline, independientemente del éxito o fallo.
