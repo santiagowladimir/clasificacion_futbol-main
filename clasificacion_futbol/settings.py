@@ -25,9 +25,6 @@ SECRET_KEY = 'django-insecure-(0kdvts281dv$_luzc9pi*-&cj^&h!0f)2^-%k@=tsd9n*x-1g
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', 's28c1zcd-8000.use.devtunnels.ms', '172.31.38.42', '172.31.86.47', '13.222.148.93']
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -78,7 +75,7 @@ WSGI_APPLICATION = 'clasificacion_futbol.wsgi.application'
 
 DATABASES = {
     'default': {
-         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'db_futbol',
         'USER':'postgres',
         'PASSWORD':'1234',
