@@ -4,9 +4,9 @@ services:
   db:
     image: postgres:13
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER=postgres
+      POSTGRES_PASSWORD=94369BC81C
+      POSTGRES_DB=db_futbol
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
