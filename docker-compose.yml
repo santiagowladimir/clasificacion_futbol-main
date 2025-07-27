@@ -3,10 +3,8 @@ version: '3.8'
 services:
   db:
     image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 94369BC81C
-      POSTGRES_DB: db_futbol
+    env_file::
+      - .env
     volumes:
       - pg_data:/var/lib/postgresql/data
     ports:
